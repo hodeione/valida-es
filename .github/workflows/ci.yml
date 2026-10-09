@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: El paquete se puede importar con ESM y CommonJS
+        run: |
+          node --input-type=module -e "import { validarNif } from './dist/index.js'; if (!validarNif('12345678Z').valido) process.exit(1)"
+          node -e "const { validarIban } = require('./dist/index.cjs'); if (!validarIban('ES9121000418450200051332').valido) process.exit(1)"
+
+  node18:
+    # La librería declara compatibilidad con Node 18: se compila con Node 22
+    # (las herramientas de desarrollo ya no soportan 18) y se ejecuta con 18.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: |
+          node --input-type=module -e "import { validarNif, identificar } from './dist/index.js'; if (!validarNif('X1234567L').valido || identificar('48005').tipo !== 'codigo_postal') process.exit(1)"
+          node -e "const v = require('./dist/index.cjs'); if (!v.validarIban('ES9121000418450200051332').valido || !v.validarDni(v.generarDni()).valido) process.exit(1)"
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vitest run --coverage --coverage.include=src --coverage.thresholds.lines=95

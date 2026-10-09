@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>valida-es · Validación de DNI, NIE, CIF, IBAN, NSS y más en JavaScript</title>
+    <meta name="description" content="Librería TypeScript sin dependencias para validar, formatear y generar identificadores españoles: DNI, NIE, CIF, NIF, IBAN, CCC, Seguridad Social, teléfonos, códigos postales y matrículas." />
+    <meta name="theme-color" content="#08090b" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2308090b'/%3E%3Cpath d='M8 17l5 5 11-12' stroke='%23c8ff00' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="wrap top">
+      <a class="brand" href="#">valida<span>-es</span></a>
+      <nav>
+        <a href="#probar">Probar</a>
+        <a href="#api">API</a>
+        <a href="#datos">Datos de prueba</a>
+        <a href="https://github.com/hodeione/valida-es" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <p class="tag">TypeScript · 0 dependencias · ~6 KB gzip</p>
+        <h1>Valida datos españoles<br /><em>sin adivinar.</em></h1>
+        <p class="lead">
+          DNI, NIE, CIF, NIF especiales, IBAN, cuenta bancaria, Seguridad Social, teléfonos, códigos postales y matrículas.
+          Cada error explica el motivo en castellano, y hay generadores de datos de prueba válidos.
+        </p>
+        <div class="install">
+          <code id="install">npm install valida-es</code>
+          <button class="copy" data-copy="install" type="button">Copiar</button>
+        </div>
+      </section>
+
+      <section id="probar" class="card">
+        <label for="todo" class="label">Pega cualquier dato y te digo qué es</label>
+        <input id="todo" class="big" autocomplete="off" spellcheck="false" placeholder="12345678Z · ES91 2100 0418 4502 0005 1332 · 600 11 22 33 · 48005 · 1234 BCD" />
+        <div id="todo-out" class="out" aria-live="polite"></div>
+        <div class="chips" id="ejemplos"></div>
+      </section>
+
+      <section class="grid2">
+        <div class="card">
+          <label class="label" for="fn">Prueba un validador concreto</label>
+          <div class="row">
+            <select id="fn"></select>
+            <input id="fn-in" autocomplete="off" spellcheck="false" placeholder="Escribe aquí" />
+          </div>
+          <pre id="fn-out" class="json" aria-live="polite"></pre>
+          <pre class="code" id="fn-code"></pre>
+        </div>
+
+        <div class="card" id="datos">
+          <p class="label">Datos de prueba válidos (ficticios)</p>
+          <div id="gen" class="gen"></div>
+          <p class="hint">Útiles para rellenar formularios y tests. Usa <code>aleatorioConSemilla()</code> para que sean reproducibles.</p>
+        </div>
+      </section>
+
+      <section id="api" class="card">
+        <p class="label">Uso</p>
+        <pre class="code"><span class="k">import</span> { validarNif, validarIban, identificar } <span class="k">from</span> <span class="s">'valida-es'</span>
+
+<span class="k">const</span> r = validarNif(<span class="s">'x-1234567-l'</span>)
+<span class="k">if</span> (r.valido) {
+  r.valor  <span class="c">// 'X1234567L' (normalizado)</span>
+  r.tipo   <span class="c">// 'NIE'</span>
+} <span class="k">else</span> {
+  r.motivo  <span class="c">// 'vacio' | 'formato' | 'longitud' | 'control' | 'pais' | 'rango'</span>
+  r.mensaje <span class="c">// 'La letra no corresponde: debería ser L.'</span>
+}
+
+validarIban(<span class="s">'ES9121000418450200051332'</span>).datos <span class="c">// { pais: 'ES', banco: { codigo: '2100', nombre: 'CaixaBank' } }</span>
+identificar(<span class="s">'600 11 22 33'</span>) <span class="c">// { tipo: 'telefono', subtipo: 'movil', valor: '+34600112233' }</span></pre>
+        <div class="table" id="tabla"></div>
+      </section>
+    </main>
+
+    <footer class="wrap foot">
+      <span>MIT · hecho por <a href="https://github.com/hodeione" target="_blank" rel="noopener">Hodei Medina</a></span>
+      <span>Todo se calcula en tu navegador.</span>
+    </footer>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
